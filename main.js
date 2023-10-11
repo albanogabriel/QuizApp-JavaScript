@@ -36,6 +36,7 @@ let currentQuestionIndex = 0;
 let score = 0;
 
 function startQuiz(){
+    //set a state for a currentQuestionIndex and Score. 
     currentQuestionIndex = 0
     score = 0
     nextButton.innerHTML = "Next"
@@ -44,23 +45,52 @@ function startQuiz(){
 
 function showQuestion() {
     resetState()
+    //renderiza o número e o título no question element, usando como ref. o index do array de objetos. (o +1 é para burlar o [0(0+1), 1(1+1)...])
     let currentQuestion = questions[currentQuestionIndex]
     let questionNo = currentQuestionIndex + 1
     questionElement.innerHTML = questionNo + ". " + currentQuestion.question
 
+    //renderiza todas as answers.text de questions, nosso array de objetos
     currentQuestion.answers.forEach(answer => {
         const button = document.createElement('button')
         button.innerHTML = answer.text
         button.classList.add("btn")
         answerButtons.appendChild(button)
+        if(answer.correct){
+            button.dataset.correct = answer.correct
+            console.log(button)
+        }
+        button.addEventListener('click', selectAnswer)
     })
 }
 
 function resetState() {
+    //remove all preview answers
     nextButton.style.display = "none"
+    //Enquanto tiver um firstChild(01 filho), irá executar o loop e remover
     while(answerButtons.firstChild){
         answerButtons.removeChild(answerButtons.firstChild)
     }
+}
+
+function selectAnswer(e) {
+    const selectedBtn = e.target
+    const isCorrect = selectedBtn.dataset.correct === 'true' 
+
+    if(isCorrect){
+        selectedBtn.classList.add('correct')
+    } else {
+        selectedBtn.classList.add('incorrect')
+    }
+
+    Array.from(answerButtons.children).forEach(button => {
+        if(button.dataset.correct === 'true'){
+            button.classList.add('correct')
+        }
+        button.disabled = true
+    })
+
+    nextButton.style.display = 'block'
 }
 
 startQuiz()
